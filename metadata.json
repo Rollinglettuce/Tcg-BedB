@@ -1,0 +1,6 @@
+{
+  "name": "Card Game Database & Console",
+  "description": "Comprehensive real-time Firestore database console for managing card stats, players, inventory list, deck crafting, and live matchmaking syncing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

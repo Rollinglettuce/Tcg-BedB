@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- REUSABLE UTILITIES ---
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- COLLECTION RULE GROUPS ---
+
+    // 0. Test Connection Database
+    match /test/{documentId} {
+      allow read, write: if true;
+    }
+
+    // 1. Global Card Stats Database
+    match /cards/{cardId} {
+      allow read, write: if true;
+    }
+
+    // 2. Players Main Profile & Sync Presences
+    match /players/{playerId} {
+      allow read, write: if true;
+      
+      // Subcollection: Player Inventories
+      match /inventory/{cardId} {
+        allow read, write: if true;
+      }
+
+      // Subcollection: Custom Decks
+      match /decks/{deckId} {
+        allow read, write: if true;
+      }
+    }
+
+    // 3. Matchmaking Queue Root (Real-Time Synced Pools)
+    match /matchmaking_queue/{ticketId} {
+      allow read, write: if true;
+    }
+
+    // 4. Live Match Rooms
+    match /matches/{matchId} {
+      allow read, write: if true;
+    }
+
+    // 5. User Settings & Sheets Database Config
+    match /settings/{settingsId} {
+      allow read, write: if true;
+    }
+  }
+}

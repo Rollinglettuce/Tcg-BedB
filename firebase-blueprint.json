@@ -1,0 +1,135 @@
+{
+  "entities": {
+    "card": {
+      "title": "Card",
+      "description": "Represents a digital collectible card with stats and abilities.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the card" },
+        "name": { "type": "string", "description": "Display name of the card" },
+        "cost": { "type": "integer", "description": "Energy/resource cost to play the card" },
+        "attack": { "type": "integer", "description": "Attack damage value" },
+        "health": { "type": "integer", "description": "Health points value" },
+        "type": { "type": "string", "enum": ["Minion", "Spell", "Weapon", "Artifact"], "description": "Card category" },
+        "rarity": { "type": "string", "enum": ["Common", "Rare", "Epic", "Legendary"], "description": "Collectibility rank" },
+        "ability": { "type": "string", "description": "Special rules text or battlecry" },
+        "imageUrl": { "type": "string", "description": "Asset URL for card illustration" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["id", "name", "cost", "attack", "health", "type", "rarity", "ability", "createdAt"]
+    },
+    "player": {
+      "title": "Player",
+      "description": "Represents player profile and presence state.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "User UID matched to auth" },
+        "username": { "type": "string", "description": "Display nickname of the player" },
+        "level": { "type": "integer", "description": "Player Level" },
+        "xp": { "type": "integer", "description": "Experience Points" },
+        "status": { "type": "string", "enum": ["offline", "online", "queuing", "in-game"], "description": "Current sync/activity state" },
+        "currentMatchId": { "type": "string", "description": "ID of the current active match, if any" },
+        "rating": { "type": "integer", "description": "Matchmaking performance rating" },
+        "lastSyncAt": { "type": "string", "format": "date-time", "description": "Timestamp of last server heartbeat" }
+      },
+      "required": ["id", "username", "level", "xp", "status", "rating", "lastSyncAt"]
+    },
+    "inventoryItem": {
+      "title": "Inventory Item",
+      "description": "Quantity of a specific card owned by a player.",
+      "type": "object",
+      "properties": {
+        "cardId": { "type": "string", "description": "ID of the owned card" },
+        "quantity": { "type": "integer", "description": "Number of copies owned" },
+        "acquiredAt": { "type": "string", "format": "date-time", "description": "Purchase or unlock timestamp" }
+      },
+      "required": ["cardId", "quantity", "acquiredAt"]
+    },
+    "deck": {
+      "title": "Player Deck",
+      "description": "A custom build deck created by a player.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique deck identifier" },
+        "playerId": { "type": "string", "description": "Owner player's UID" },
+        "name": { "type": "string", "description": "Display name of the custom deck" },
+        "cardIds": { "type": "array", "description": "Ordered or un-ordered IDs of cards contained in the deck" },
+        "isActive": { "type": "boolean", "description": "Whether this is currently selected deck for matchmaking" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when deck was crafted" }
+      },
+      "required": ["id", "playerId", "name", "cardIds", "isActive", "createdAt"]
+    },
+    "matchmakingTicket": {
+      "title": "Matchmaking Ticket",
+      "description": "An active ticket represent dynamic player queueing.",
+      "type": "object",
+      "properties": {
+        "playerId": { "type": "string", "description": "UID of the queuing player" },
+        "username": { "type": "string", "description": "Player nickname" },
+        "deckId": { "type": "string", "description": "Selected deck ID for play" },
+        "rating": { "type": "integer", "description": "Skill tier search weight" },
+        "enteredAt": { "type": "string", "format": "date-time", "description": "Queue join check-in" }
+      },
+      "required": ["playerId", "username", "deckId", "rating", "enteredAt"]
+    },
+    "match": {
+      "title": "Active Match",
+      "description": "Represents a live card game duel between two synced players.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique ID of the match session" },
+        "player1Id": { "type": "string", "description": "UID of the host player" },
+        "player1Username": { "type": "string", "description": "Name of host player" },
+        "player2Id": { "type": "string", "description": "UID of the opponent player" },
+        "player2Username": { "type": "string", "description": "Name of opponent player" },
+        "status": { "type": "string", "enum": ["waiting", "playing", "finished"], "description": "State transition marker" },
+        "winnerId": { "type": "string", "description": "UID of victor, empty if undecided" },
+        "turn": { "type": "integer", "description": "Active game turn coordinate" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Latest move ping" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Instance start time" }
+      },
+      "required": ["id", "player1Id", "player1Username", "player2Id", "player2Username", "status", "turn", "updatedAt", "createdAt"]
+    },
+    "sheetConfig": {
+      "title": "Sheet Configuration",
+      "description": "Google Sheets synchronization settings for a user.",
+      "type": "object",
+      "properties": {
+        "spreadsheetId": { "type": "string", "description": "Google Spreadsheet unique identifier" },
+        "spreadsheetUrl": { "type": "string", "description": "Direct URL of the spreadsheet" },
+        "syncedAt": { "type": "string", "format": "date-time", "description": "Last synchronization timestamp" }
+      },
+      "required": ["spreadsheetId", "spreadsheetUrl"]
+    }
+  },
+  "firestore": {
+    "settings": {
+      "schema": "sheetConfig",
+      "description": "Global or user settings document containers."
+    },
+    "cards": {
+      "schema": "card",
+      "description": "Master list of available game cards and statistics."
+    },
+    "players": {
+      "schema": "player",
+      "description": "Sync database with active gamer profiles."
+    },
+    "players/{playerId}/inventory": {
+      "schema": "inventoryItem",
+      "description": "Collection of dynamic card inventory sheets per player."
+    },
+    "players/{playerId}/decks": {
+      "schema": "deck",
+      "description": "Player-owned decks of specific card sheets."
+    },
+    "matchmaking_queue": {
+      "schema": "matchmakingTicket",
+      "description": "Global queue room for real-time duel matching."
+    },
+    "matches": {
+      "schema": "match",
+      "description": "Active match lobby and event synchronization sheet."
+    }
+  }
+}
