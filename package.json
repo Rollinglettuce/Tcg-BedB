@@ -1,14 +1,24 @@
 {
-  "name": "react-example",
+  "name": "essence-ccg-platform",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build",
+    "dev:admin": "npm run dev",
+    "dev:cardforge": "npm run dev --workspace=@essence/cardforge",
+    "build": "vite build && npm run build --workspaces --if-present",
+    "build:admin": "vite build",
+    "build:cardforge": "npm run build --workspace=@essence/cardforge",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "clean": "rm -rf dist server.js apps/*/dist packages/*/dist",
+    "lint": "tsc --noEmit && npm run lint --workspaces --if-present",
+    "typecheck": "tsc --noEmit && npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
