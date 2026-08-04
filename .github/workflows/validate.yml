@@ -1,0 +1,30 @@
+name: Validate platform
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - chore/monorepo-foundation
+
+jobs:
+  build-and-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Type-check applications
+        run: npm run typecheck
+
+      - name: Build applications
+        run: npm run build
